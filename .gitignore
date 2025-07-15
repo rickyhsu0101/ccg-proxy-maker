@@ -1,0 +1,6 @@
+*.pdf
+__pycache__/
+venv/
+Pipfile.lock
+*.txt
+*.json
