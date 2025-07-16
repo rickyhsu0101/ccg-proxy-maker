@@ -5,8 +5,14 @@ from repository.card_db_repository import CardDbRepository
 class CardListFileReader:
     def __init__(self):
         self.cardDbRepository = CardDbRepository()
-  
-
+    
+    def parse_file_local(self, path: str, patternFormatter, lang: str):
+        f = open(path, "r")
+        lines = f.readlines()
+        f.close()
+        print([self.parse_line(line, lang) for line in lines])
+        print([patternFormatter(series, sets, id) for series, sets, id in [self.parse_line(line, lang) for line in lines]])
+        return [patternFormatter(series, sets, id) for series, sets, id in [self.parse_line(line, lang) for line in lines]]
     def parse_line(self, line: str, lang: str) -> Tuple[str, str, str] | None:
         match = re.match(r"([a-zA-Z]+)\/([a-zA-Z0-9]+)-([a-zA-Z0-9]+)", line)
         if match is None:
