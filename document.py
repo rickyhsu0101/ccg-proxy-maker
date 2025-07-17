@@ -1,9 +1,11 @@
 from enum import Enum
 from PIL import Image, ImageDraw
-from typing import List, Tuple
+from typing import List, Tuple, Self
 from model.document import *
 from model.card import *
 from model.layout import *
+from data.model.CardData import CardData
+from util.text import CardText
 from math import ceil
 
 class Document():
@@ -18,6 +20,8 @@ class Document():
         self.padding: int= 0
         self.margin: int = 0
         self.cardType: CardType = CardType.STANDARD
+        self.cardText = CardText()
+        self.drawText: bool = False
 
     def set_document_type(self, docType: DocumentType):
         self.docType = docType
@@ -25,6 +29,9 @@ class Document():
     
     def set_dpi(self, dpi: int):
         self.dpi = dpi
+        return self
+    def add_translation(self):
+        self.drawText = True
         return self
     
     def set_dividers(
@@ -35,7 +42,9 @@ class Document():
         self.verticalDivider = vertical
         self.horizontalDivider = horizontal
         return self
-    
+    def set_card_text(self, cardText: CardText):
+        self.cardText = cardText
+        return self
     def set_margin(
             self,
             margin: int = 0
@@ -176,12 +185,21 @@ class Document():
             for pageNum, page in enumerate(pageImages)
         ]
         return pageImages
-
-    def output_document(self, imageList: List[Image.Image]) -> List[Image.Image]:
+    def _draw_text(self, cardImages: List[Image.Image], cardDataList: List[CardData]):
+        [
+            self.cardText.draw_text(cardImages[ind], cardData)
+            for ind, cardData in enumerate(cardDataList)
+            # if (cardData.textAnchor.compute_text_bound()) is not None
+        ]
+    def output_document(self, imageList: List[Image.Image], cardDataList: List[CardData] | None = None) -> List[Image.Image]:
         self._set_dim()
+        print("og mode")
+        # print(imageList[0].convert("RGB").mode)
         docInfo: DocumentInfo = self._get_docinfo()
         scaledWidth, scaledHeight = self._determine_image_size(docInfo)
         scaledImages: List[Image.Image] = scale_images(imageList, scaledWidth, scaledHeight)
+        if(self.drawText):
+            self._draw_text( scaledImages, cardDataList)
         layout: Layout = self._determine_layout(scaledWidth, scaledHeight)
         return self._draw_pages(scaledImages, layout)
         

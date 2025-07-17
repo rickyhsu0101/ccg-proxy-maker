@@ -4,3 +4,4 @@ venv/
 Pipfile.lock
 *.txt
 *.json
+*.csv
