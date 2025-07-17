@@ -20,6 +20,6 @@ class CardData():
 
 DEFAULT_TEXT_ANCHOR = {
     WeissCardType.CHARACTER : TextAnchor(left=5, right=5, bottom=12),
-    WeissCardType.EVENT: TextAnchor(left=5, right=5, bottom=10),
+    WeissCardType.EVENT: TextAnchor(left=5, right=5, bottom=9.5),
     WeissCardType.CLIMAX: TextAnchor(left=10, right=60, bottom=20)
 }

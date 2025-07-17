@@ -43,6 +43,7 @@ class ImageRepository():
                 for data in self.cardData
             ]
         resImages = [res.get() for res in results]
+        pool.close()
         return [image for image in resImages if image is not None]
     def get_images(self):
         images: List[Image.Image]  = []

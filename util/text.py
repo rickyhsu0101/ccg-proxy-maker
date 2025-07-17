@@ -1,5 +1,5 @@
 from typing import List, Tuple, Self
-from PIL import ImageDraw, ImageFont, Image
+from PIL import ImageDraw, ImageFont, Image, ImageColor
 from PIL.ImageFont import FreeTypeFont
 from data.model.CardData import CardData, DEFAULT_TEXT_ANCHOR
 from util.model.TextBound import TextBound
@@ -12,15 +12,19 @@ class CardText():
         self.fontSize: int = 20
         self.spacing: int = 8
         self.line_padding: int = 4
+        self.stroke_width: int = 2
     def set_texts(self, texts: List[str]):
         self.texts = texts
         return self
     def set_font_size(self, fontSize: int):
-        self.font = ImageFont.truetype("arial.ttf", fontSize)
+        self.font = ImageFont.truetype("Arial.ttf", fontSize)
         self.fontSize = fontSize
         return self
     def set_spacing(self, spacing: int):
         self.spacing = spacing
+        return self
+    def set_stroke_width(self, width: int):
+        self.stroke_width = width
         return self
     def set_line_pading(self, padding):
         self.line_padding = padding
@@ -93,6 +97,7 @@ class CardText():
                 font = self.font
             )
         )
+        opacity = 0.7
         draw.rectangle(
             xy = [
                 loc,
@@ -101,7 +106,7 @@ class CardText():
                     loc[1] + self.fontSize + 2 * self.line_padding
                 )
             ],
-            fill = cardColor,
+            fill = ImageColor.getrgb(cardColor) + (int(255*opacity),),
             width = 0
         )
     def _draw_text(self, draw: ImageDraw.ImageDraw, text: str, loc: Tuple[int, int]):
@@ -110,7 +115,7 @@ class CardText():
             text = text,
             font = self.font,
             fill= "white",
-            stroke_width=2,
+            stroke_width=self.stroke_width,
             stroke_fill="black"
         )
     def _update_start_point(self, point: Tuple[int, int]):
@@ -118,13 +123,13 @@ class CardText():
             point[0],
             point[1] + self.fontSize + 2 * self.line_padding + self.spacing
         )
-    def draw_text(self, image: Image.Image, cardData: CardData):
+    def draw_text(self, image: Image.Image, cardData: CardData) -> Image.Image:
         textBound: TextBound = cardData.textAnchor.compute_text_bound(
             width = image.width, 
             height = image.height
         )
         if(cardData.cardType == WeissCardType.CLIMAX):
-            return
+            return image
         # if cardData.cardId == "049":
         #     print(cardData.textAnchor)
         #     print(textBound)
@@ -135,7 +140,7 @@ class CardText():
                 height = image.height
             )
         if(not textBound.is_drawable()):
-            return
+            return image
         self.texts = cardData.cardAbility
         # print(cardData.cardAbility)
         # print("mode")
@@ -161,16 +166,28 @@ class CardText():
         print(len(lines))
         print(height)
         print(textBound)
+        overlay = Image.new('RGBA', image.size, (255,255,255,0))
+        overlayDraw = ImageDraw.Draw(overlay)
         [
             (
                 self._draw_text_background(
-                    draw = draw,
+                    draw = overlayDraw,
                     text = line,
                     loc = point,
                     cardColor = cardData.cardColor.name
-                ), 
+                ),
+                point := self._update_start_point(point)
+            )
+            for line in lines
+        ]
+
+        newImage = Image.alpha_composite(image.convert("RGBA"), overlay)
+        newImageDraw = ImageDraw.Draw(newImage)
+        point = startPoint
+        [
+            (
                 self._draw_text(
-                    draw = draw,
+                    draw = newImageDraw,
                     text = line,
                     loc = point
                 ),
@@ -178,3 +195,5 @@ class CardText():
             )
             for line in lines
         ]
+
+        return newImage.convert("RGB")

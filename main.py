@@ -1,10 +1,11 @@
-from PIL import Image
+from PIL import Image, ImageFont
 from repository.image_repository import ImageRepository
 from typing import List
 from document import Document
 from model.card import CardType
 from model.document import DocumentType
 from data.read_file import CardListFileReader
+from util.text import CardText
 
 def main():
     # def formatter(series, sets, id):
@@ -20,7 +21,27 @@ def main():
     # images: List[Image.Image] = repository.set_image_links(l).get_images_multiprocess()
     images: List[Image.Image] = repository.set_card_data(l).get_images_multiprocess()
 
-    doc: Document = Document().add_translation().set_card_type(CardType.STANDARD).set_document_type(DocumentType.LETTER).set_padding(10).set_dividers(4,4)
+    cardText = CardText(
+    ).set_font_size(
+        int(20*10/3)
+    ).set_line_pading(
+        int(4*10/3)
+    ).set_spacing(
+        int(8*10/3)
+    ).set_stroke_width(int(2*10/3))
+
+    doc: Document = Document().set_dpi(
+        1000
+    ).set_card_text(
+        cardText
+    ).add_translation(
+    ).set_card_type(
+        CardType.STANDARD
+    ).set_document_type(
+        DocumentType.LETTER
+    ).set_padding(
+        30
+    ).set_dividers(10,10)
     # doc: Document = Document().set_dpi(1000).set_card_type(CardType.STANDARD).set_document_type(DocumentType.LETTER).set_padding(30).set_dividers(10,10)
     pages: List[Image.Image] = doc.output_document(imageList= images, cardDataList=l)
 

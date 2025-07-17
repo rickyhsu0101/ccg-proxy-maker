@@ -185,8 +185,8 @@ class Document():
             for pageNum, page in enumerate(pageImages)
         ]
         return pageImages
-    def _draw_text(self, cardImages: List[Image.Image], cardDataList: List[CardData]):
-        [
+    def _draw_text(self, cardImages: List[Image.Image], cardDataList: List[CardData])-> List[Image.Image]:
+        return [
             self.cardText.draw_text(cardImages[ind], cardData)
             for ind, cardData in enumerate(cardDataList)
             # if (cardData.textAnchor.compute_text_bound()) is not None
@@ -199,7 +199,7 @@ class Document():
         scaledWidth, scaledHeight = self._determine_image_size(docInfo)
         scaledImages: List[Image.Image] = scale_images(imageList, scaledWidth, scaledHeight)
         if(self.drawText):
-            self._draw_text( scaledImages, cardDataList)
+            scaledImages = self._draw_text( scaledImages, cardDataList)
         layout: Layout = self._determine_layout(scaledWidth, scaledHeight)
         return self._draw_pages(scaledImages, layout)
         
