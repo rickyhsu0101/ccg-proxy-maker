@@ -18,7 +18,8 @@ DEFAULT_DPI = 300
 
 DEFAULT_DOCUMENT_DIMS = {
     DocumentType.A4: DocumentInfo(300, 2480, 3508),
-    DocumentType.LETTER: DocumentInfo(300, 2550-49, 3300-99),
-    # DocumentType.LETTER: DocumentInfo(300, 2550-118, 3300-47),
+    # DocumentType.LETTER: DocumentInfo(300, 2550-49, 3300-99),
+    DocumentType.LETTER: DocumentInfo(300, 2550-45, 3300-85),
+    # DocumentType.LETTER: DocumentInfo(300, 2550-55, 3300-108),
     DocumentType.CUSTOM: DocumentInfo(300, 0, 0)
 }

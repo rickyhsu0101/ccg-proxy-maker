@@ -8,13 +8,18 @@ from data.model.WeissCardType import WeissCardType
 class CardText():
     def __init__(self):
         self.texts: List[str] = []
-        self.font: FreeTypeFont = ImageFont.truetype("DejaVuSans.ttf", 20)
+        # self.font: FreeTypeFont = ImageFont.truetype("DejaVuSans.ttf", 20)
+        self.font: FreeTypeFont = ImageFont.truetype("~/usr/share/fonts/opentype/noto/NotoSansCJK-Light.ttc", 20)
         self.fontSize: int = 20
-        self.spacing: int = 8
-        self.line_padding: int = 4
+        self.spacing: int = 8 #8
+        self.line_padding: int = 4 #4
         self.stroke_width: int = 2
         self.outline_rect: bool = False
         self.full_background: bool = False
+        self.additional_text_move_horiz: int = 0
+        self.additional_text_move_vert: int = -20
+        self.full_background_additional_width: Tuple[int, int] = (0,0)
+        self.full_background_additional_height: Tuple[int, int] = (0,20)
     def set_outline_rect(self, outline_rect):
         self.outline_rect = outline_rect
         return self
@@ -25,7 +30,7 @@ class CardText():
         self.texts = texts
         return self
     def set_font_size(self, fontSize: int):
-        self.font = ImageFont.truetype("DejaVuSans.ttf", fontSize)
+        self.font = ImageFont.truetype("~/usr/share/fonts/opentype/noto/NotoSansCJK-Light.ttc", fontSize)
         self.fontSize = fontSize
         return self
     def set_spacing(self, spacing: int):
@@ -147,12 +152,12 @@ class CardText():
         draw.rectangle(
             xy = [
                 (
-                    start[0] - (10 if self.outline_rect else 0),
-                    start[1] - (10 if self.outline_rect else 0)
+                    start[0] - (10 if self.outline_rect else 0) + self.full_background_additional_width[0],
+                    start[1] - (10 if self.outline_rect else 0) + self.full_background_additional_width[1]
                 ),
                 (
-                    end[0] + (10 if self.outline_rect else 0),
-                    end[1] + (10 if self.outline_rect else 0)
+                    end[0] + (10 if self.outline_rect else 0) + self.full_background_additional_height[0],
+                    end[1] + (10 if self.outline_rect else 0) + self.full_background_additional_height[1]
                 ),
             ],
             fill = (211,211,211) + (int(255*opacity),),
@@ -182,16 +187,15 @@ class CardText():
             point[1] + self.fontSize + 2 * self.line_padding + self.spacing
         )
     def draw_text(self, image: Image.Image, cardData: CardData) -> Image.Image:
+        if not cardData.translate:
+            return image
         textBound: TextBound = cardData.textAnchor.compute_text_bound(
             width = image.width, 
             height = image.height
         )
         if(cardData.cardType == WeissCardType.CLIMAX):
             return image
-        # if cardData.cardId == "049":
-        #     print(cardData.textAnchor)
-        #     print(textBound)
-        #print(cardData)
+
         if(textBound is None):
             textBound = DEFAULT_TEXT_ANCHOR[cardData.cardType].compute_text_bound(
                 width = image.width, 
@@ -200,9 +204,7 @@ class CardText():
         if(not textBound.is_drawable()):
             return image
         self.texts = cardData.cardAbility
-        # print(cardData.cardAbility)
-        # print("mode")
-        # print(image.mode)
+
         
         draw: ImageDraw.ImageDraw  = ImageDraw.Draw(image)
 
@@ -221,6 +223,9 @@ class CardText():
                 textBound.bottomRight[1] - height
             )
             endPoint = textBound.bottomRight
+        #font issue move text a bit
+        startPoint = (startPoint[0]+self.additional_text_move_horiz, startPoint[1]+self.additional_text_move_vert)
+        endPoint = (endPoint[0]+self.additional_text_move_horiz, endPoint[1]+self.additional_text_move_vert)
         point: Tuple[int, int] = startPoint
         print(startPoint)
         print(multiline_texts)

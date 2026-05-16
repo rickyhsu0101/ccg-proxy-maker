@@ -1,5 +1,5 @@
 from enum import Enum
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from typing import List, Tuple, Self
 from model.document import *
 from model.card import *
@@ -188,8 +188,15 @@ class Document():
     def _draw_text(self, cardImages: List[Image.Image], cardDataList: List[CardData])-> List[Image.Image]:
         return [
             self.cardText.draw_text(cardImages[ind], cardData)
+            if cardData.translate else
+            cardImages[ind]
             for ind, cardData in enumerate(cardDataList)
             # if (cardData.textAnchor.compute_text_bound()) is not None
+        ]
+    def _sharpen_images(self, imageList: List[Image.Image]) -> List[Image.Image]:
+        return [
+            image.filter(ImageFilter.SHARPEN).filter(ImageFilter.SHARPEN)
+            for image in imageList
         ]
     def output_document(self, imageList: List[Image.Image], cardDataList: List[CardData] | None = None) -> List[Image.Image]:
         self._set_dim()
@@ -198,8 +205,10 @@ class Document():
         docInfo: DocumentInfo = self._get_docinfo()
         scaledWidth, scaledHeight = self._determine_image_size(docInfo)
         scaledImages: List[Image.Image] = scale_images(imageList, scaledWidth, scaledHeight)
+        # scaledImages = self._sharpen_images(scaledImages)
         if(self.drawText):
             scaledImages = self._draw_text( scaledImages, cardDataList)
+        
         layout: Layout = self._determine_layout(scaledWidth, scaledHeight)
         return self._draw_pages(scaledImages, layout)
         

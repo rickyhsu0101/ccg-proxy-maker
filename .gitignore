@@ -3,5 +3,4 @@ __pycache__/
 venv/
 Pipfile.lock
 *.txt
-*.json
 *.csv

@@ -16,6 +16,7 @@ class CardData():
     cardColor: WeissCardType | None = None
 
     textAnchor: TextAnchor = field(default_factory=lambda: TextAnchor())
+    translate: bool = False
 
 
 DEFAULT_TEXT_ANCHOR = {

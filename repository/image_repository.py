@@ -16,9 +16,13 @@ class ImageRepository():
         return self
     def _get_image(self, link) -> Image.Image | None:
         try:
-           return Image.open(requests.get(link, stream=True).raw)
+           return Image.open(requests.get(link, headers={
+               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0"
+           }, stream=True).raw)
         except Exception as e:
+            print(e)
             print("error on image fetch")
+            print(link)
         return None
     def get_image(self, link: str):
         image = self._get_image(link)
