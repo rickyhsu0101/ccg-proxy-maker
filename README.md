@@ -22,14 +22,14 @@ JP,GIM/W124-037EX,4,,,,,,NT
 <TRANSLATE> := T | NT (by default with translation setting on in main all cards will be translated if Japanese)
 ```
 ### Using anchor
-You need 3 positive value (pixels on image) and 1 negative value (-1) for the text box to grow to accomodate the size of the overall generated text. By default there is a setup for anchors for all cards. This is really used so far when card text are in a nonstandard on the card.
+You need 3 positive value (pixels on image) and 1 empty field for the text box to grow to accomodate the size of the overall generated text. By default there is an existing setup for anchors for all cards. This is really used when card text are in a nonstandard location on the card.
 
 For example, for the below setup, the top anchor is unbound meaning the box will grow upwards. 
 ```
-<ANCHOR-TOP> := -1
 <ANCHOR-RIGHT> := 3
 <ANCHOR-LEFT> := 3
 <ANCHOR-BOTTOM> := 3
+,3,3,3
 ```
 ### Document DIM
 By default the document dims are located in ```model/document.py```. This is where you manipulate the output of the document at 300 DPI. Output doc will be scaled up or down to the default document dims. Due to the nature of printing in printable area, smaller document dims will result in larger output in cards in general vice versa. Use this to fine tune card sizes from prints.
